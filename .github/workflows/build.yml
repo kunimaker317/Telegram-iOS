@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           brew install bazelisk
-          pip3 install pyaml
+          pip3 install pyaml --break-system-packages
 
       - name: Build Telegram
         run: |
