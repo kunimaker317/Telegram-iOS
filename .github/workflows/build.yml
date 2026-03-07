@@ -60,6 +60,8 @@ jobs:
             --configuration=debug_arm64 \
             --configurationPath=build_config.json \
             --codesigningInformationPath=buildbox/fake-codesigning \
+            --disableProvisioningProfiles \
+            --disableExtensions \
             --target=Telegram
 
       - name: Package IPA
