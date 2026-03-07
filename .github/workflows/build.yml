@@ -57,7 +57,7 @@ jobs:
             --overrideXcodeVersion \
             build \
             --buildNumber=1 \
-            --configuration=release_arm64 \
+            --configuration=debug_arm64 \
             --configurationPath=build_config.json \
             --codesigningInformationPath=buildbox/fake-codesigning \
             --target=Telegram
