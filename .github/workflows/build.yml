@@ -19,6 +19,15 @@ jobs:
         with:
           xcode-version: '26.2'
 
+      # === ДОБАВЛЕН КЭШ BAZEL ===
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE', '**/BUILD', '**/*.bzl') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
       - name: Install dependencies
         run: |
           pip3 install pyaml --break-system-packages
@@ -49,7 +58,6 @@ jobs:
           }
           EOF
 
-      # === ДОБАВЬТЕ ЭТОТ ШАГ ===
       - name: Import Fake Certificates
         run: |
           python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
@@ -65,11 +73,14 @@ jobs:
             --configurationPath=build_config.json \
             --codesigningInformationPath=build-system/fake-codesigning \
             --target=Telegram
-            
+
+      # === ИСПРАВЛЕННЫЙ ШАГ УПАКОВКИ ===
       - name: Package IPA
         run: |
           mkdir -p Payload
-          APP=$(find . -name "Telegram.app" -not -path "*/bazel-*" | head -1)
+          # Ищем строго в папке bazel-bin, куда Bazel складывает результат
+          APP=$(find bazel-bin -type d -name "Telegram.app" | head -1)
+          echo "Found Telegram.app at: $APP"
           cp -r "$APP" Payload/
           zip -r Telegram.ipa Payload/
 
