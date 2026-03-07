@@ -49,6 +49,11 @@ jobs:
           }
           EOF
 
+      # === ДОБАВЬТЕ ЭТОТ ШАГ ===
+      - name: Import Fake Certificates
+        run: |
+          python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
+
       - name: Build Telegram
         run: |
           python3 build-system/Make/Make.py \
@@ -60,6 +65,7 @@ jobs:
             --configurationPath=build_config.json \
             --codesigningInformationPath=build-system/fake-codesigning \
             --target=Telegram
+            
       - name: Package IPA
         run: |
           mkdir -p Payload
