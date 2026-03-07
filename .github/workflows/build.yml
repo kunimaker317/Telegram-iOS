@@ -34,10 +34,10 @@ jobs:
         run: |
           cat > build_config.json << EOF
           {
-            "bundle_id": "org.5eaa4afdbf16eb10.Telegram",
+            "bundle_id": "ph.telegra.Telegraph",
             "api_id": "${{ secrets.TELEGRAM_API_ID }}",
             "api_hash": "${{ secrets.TELEGRAM_API_HASH }}",
-            "team_id": "5eaa4afdbf16eb10",
+            "team_id": "C67CF9S4VU",
             "app_center_id": "0",
             "is_internal_build": "true",
             "is_appstore_build": "false",
@@ -57,11 +57,10 @@ jobs:
             --overrideXcodeVersion \
             build \
             --buildNumber=1 \
-            --configuration=debug_arm64 \
+            --configuration=release_arm64 \
             --configurationPath=build_config.json \
             --codesigningInformationPath=build-system/fake-codesigning \
             --target=Telegram
-
       - name: Package IPA
         run: |
           mkdir -p Payload
