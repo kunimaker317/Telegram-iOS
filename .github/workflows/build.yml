@@ -24,39 +24,24 @@ jobs:
           brew install bazelisk
           pip3 install pyaml --break-system-packages
 
-      - name: Inspect build system
+      - name: Show config template
         run: |
-          echo "=== Make.py build help ==="
-          python3 build-system/Make/Make.py build --help
-          echo "=== Repo root files ==="
-          ls -la
-          echo "=== build-system contents ==="
-          ls -la build-system/
-          echo "=== Looking for config examples ==="
-          find . -name "*.json" -path "*/buildbox/*" 2>/dev/null | head -20
-          find . -name "*.yaml" -path "*/build*" 2>/dev/null | head -20
-
-      - name: Create build configuration
-        run: |
-          mkdir -p build_config
-          cat > build_config/variables.json << 'EOF'
-          {
-            "bundleId": "org.telegram.Telegram-iOS",
-            "appGroupId": "group.org.telegram.Telegram-iOS",
-            "keychainGroup": "com.apple.security.application-groups"
-          }
-          EOF
+          echo "=== template_minimal ==="
+          cat build-system/template_minimal_development_configuration.json
+          echo "=== appstore config ==="
+          cat build-system/appstore-configuration.json
+          echo "=== buildbox ==="
+          ls -la buildbox/
+          cat buildbox/*.json 2>/dev/null || true
 
       - name: Build Telegram
         run: |
           python3 build-system/Make/Make.py \
             --bazel=$(which bazelisk) \
-            --apiId=${{ secrets.TELEGRAM_API_ID }} \
-            --apiHash=${{ secrets.TELEGRAM_API_HASH }} \
             build \
             --buildNumber=1 \
             --configuration=release_arm64 \
-            --configurationPath=build_config \
+            --configurationPath=build-system/template_minimal_development_configuration.json \
             --xcodeManagedCodesigning \
             --target=Telegram
 
