@@ -8,6 +8,9 @@ jobs:
     runs-on: macos-14
     timeout-minutes: 180
 
+    env:
+      USE_BAZEL_VERSION: "8.4.2"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,15 +27,24 @@ jobs:
           brew install bazelisk
           pip3 install pyaml --break-system-packages
 
-      - name: Show config template
+      - name: Create build configuration
         run: |
-          echo "=== template_minimal ==="
-          cat build-system/template_minimal_development_configuration.json
-          echo "=== appstore config ==="
-          cat build-system/appstore-configuration.json
-          echo "=== buildbox ==="
-          ls -la buildbox/
-          cat buildbox/*.json 2>/dev/null || true
+          cat > build_config.json << EOF
+          {
+            "bundle_id": "org.telegram.Telegram-iOS",
+            "api_id": "${{ secrets.TELEGRAM_API_ID }}",
+            "api_hash": "${{ secrets.TELEGRAM_API_HASH }}",
+            "team_id": "",
+            "app_center_id": "0",
+            "is_internal_build": "true",
+            "is_appstore_build": "false",
+            "appstore_id": "0",
+            "app_specific_url_scheme": "tg",
+            "premium_iap_product_id": "",
+            "enable_siri": false,
+            "enable_icloud": false
+          }
+          EOF
 
       - name: Build Telegram
         run: |
@@ -41,7 +53,7 @@ jobs:
             build \
             --buildNumber=1 \
             --configuration=release_arm64 \
-            --configurationPath=build-system/template_minimal_development_configuration.json \
+            --configurationPath=build_config.json \
             --xcodeManagedCodesigning \
             --target=Telegram
 
