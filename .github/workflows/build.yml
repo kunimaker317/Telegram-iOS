@@ -50,6 +50,7 @@ jobs:
         run: |
           python3 build-system/Make/Make.py \
             --bazel=$(which bazelisk) \
+            --overrideBazelVersion \
             build \
             --buildNumber=1 \
             --configuration=release_arm64 \
