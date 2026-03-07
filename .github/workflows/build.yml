@@ -21,11 +21,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install bazelisk
           pip3 install pyaml --break-system-packages
 
-      - name: Set Bazel version
-        run: echo "8.4.2" > .bazelversion
+      - name: Install Bazel 8.4.2
+        run: |
+          curl -L https://github.com/bazelbuild/bazel/releases/download/8.4.2/bazel-8.4.2-darwin-arm64 \
+            -o /usr/local/bin/bazel
+          chmod +x /usr/local/bin/bazel
+          bazel --version
 
       - name: Create build configuration
         run: |
@@ -49,7 +52,7 @@ jobs:
       - name: Build Telegram
         run: |
           python3 build-system/Make/Make.py \
-            --bazel=$(which bazelisk) \
+            --bazel=/usr/local/bin/bazel \
             build \
             --buildNumber=1 \
             --configuration=release_arm64 \
