@@ -34,10 +34,10 @@ jobs:
         run: |
           cat > build_config.json << EOF
           {
-            "bundle_id": "org.telegram.Telegram-iOS",
+            "bundle_id": "org.5eaa4afdbf16eb10.Telegram",
             "api_id": "${{ secrets.TELEGRAM_API_ID }}",
             "api_hash": "${{ secrets.TELEGRAM_API_HASH }}",
-            "team_id": "",
+            "team_id": "5eaa4afdbf16eb10",
             "app_center_id": "0",
             "is_internal_build": "true",
             "is_appstore_build": "false",
@@ -59,9 +59,7 @@ jobs:
             --buildNumber=1 \
             --configuration=debug_arm64 \
             --configurationPath=build_config.json \
-            --codesigningInformationPath=buildbox/fake-codesigning \
-            --disableProvisioningProfiles \
-            --disableExtensions \
+            --codesigningInformationPath=build-system/fake-codesigning \
             --target=Telegram
 
       - name: Package IPA
