@@ -28,10 +28,12 @@ jobs:
         run: |
           python3 build-system/Make/Make.py \
             --bazel=$(which bazelisk) \
-            --configuration=release_arm64 \
             --apiId=${{ secrets.TELEGRAM_API_ID }} \
             --apiHash=${{ secrets.TELEGRAM_API_HASH }} \
             build \
+            --buildNumber=1 \
+            --configuration=release_arm64 \
+            --xcodeManagedCodesigning \
             --target=Telegram
 
       - name: Package IPA
