@@ -54,7 +54,6 @@ jobs:
           python3 build-system/Make/Make.py \
             --bazel=/usr/local/bin/bazel \
             --overrideBazelVersion \
-            --overrideXcodeVersion \
             build \
             --buildNumber=1 \
             --configuration=release_arm64 \
