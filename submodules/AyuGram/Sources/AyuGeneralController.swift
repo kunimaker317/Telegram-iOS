@@ -56,6 +56,7 @@ private final class AyuGeneralArguments {
     let setShowPeerId: (Int) -> Void
     let setDeletedMark: (String) -> Void
     let setEditedMark: (String) -> Void
+    var isRussian: Bool = false
     init(
         toggleBool: @escaping (AyuGeneralBoolSetting) -> Void,
         setShowPeerId: @escaping (Int) -> Void,
@@ -154,53 +155,54 @@ private enum AyuGeneralEntry: ItemListNodeEntry {
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
         let arguments = arguments as! AyuGeneralArguments
+        let ru = arguments.isRussian
         switch self {
         case .historyHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "MESSAGE HISTORY", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ИСТОРИЯ СООБЩЕНИЙ" : "MESSAGE HISTORY", sectionId: self.section)
         case let .saveDeletedMessages(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Save Deleted Messages", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.saveDeletedMessages) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сохранять удалённые сообщения" : "Save Deleted Messages", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.saveDeletedMessages) })
         case let .saveMessagesHistory(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Save Edited Messages", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.saveMessagesHistory) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сохранять изменённые сообщения" : "Save Edited Messages", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.saveMessagesHistory) })
         case let .saveForBots(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Save History for Bots", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.saveForBots) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сохранять историю для ботов" : "Save History for Bots", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.saveForBots) })
         case .historyFooter:
-            return ItemListTextItem(presentationData: presentationData, text: .plain("Keeps a local copy of deleted and edited messages."), sectionId: self.section)
+            return ItemListTextItem(presentationData: presentationData, text: .plain(ru ? "Хранит локальную копию удалённых и изменённых сообщений." : "Keeps a local copy of deleted and edited messages."), sectionId: self.section)
         case .premiumHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "PREMIUM", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ПРЕМИУМ" : "PREMIUM", sectionId: self.section)
         case let .localPremium(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Local Telegram Premium", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.localPremium) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Локальный Telegram Premium" : "Local Telegram Premium", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.localPremium) })
         case let .disableAds(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Disable Ads", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.disableAds) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Отключить рекламу" : "Disable Ads", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.disableAds) })
         case let .disableStories(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Disable Stories", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.disableStories) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Отключить истории" : "Disable Stories", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.disableStories) })
         case .interfaceHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "INTERFACE", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ИНТЕРФЕЙС" : "INTERFACE", sectionId: self.section)
         case let .showPeerId(value):
             let label: String
             switch value {
-            case 0: label = "Hidden"
-            case 1: label = "In Profile"
-            case 2: label = "Everywhere"
-            default: label = "Hidden"
+            case 0: label = ru ? "Скрыто" : "Hidden"
+            case 1: label = ru ? "В профиле" : "In Profile"
+            case 2: label = ru ? "Везде" : "Everywhere"
+            default: label = ru ? "Скрыто" : "Hidden"
             }
-            return ItemListDisclosureItem(presentationData: presentationData, title: "Show Peer ID", label: label, sectionId: self.section, style: .blocks, action: {
+            return ItemListDisclosureItem(presentationData: presentationData, title: ru ? "Показывать ID пользователя" : "Show Peer ID", label: label, sectionId: self.section, style: .blocks, action: {
                 let next = (value + 1) % 3
                 arguments.setShowPeerId(next)
             })
         case let .showMessageSeconds(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Show Message Seconds", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.showMessageSeconds) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Показывать секунды" : "Show Message Seconds", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.showMessageSeconds) })
         case let .deletedMark(value):
-            return ItemListDisclosureItem(presentationData: presentationData, title: "Deleted Mark", label: value, sectionId: self.section, style: .blocks, action: {})
+            return ItemListDisclosureItem(presentationData: presentationData, title: ru ? "Метка удалённых" : "Deleted Mark", label: value, sectionId: self.section, style: .blocks, action: {})
         case let .editedMark(value):
-            return ItemListDisclosureItem(presentationData: presentationData, title: "Edited Mark", label: value, sectionId: self.section, style: .blocks, action: {})
+            return ItemListDisclosureItem(presentationData: presentationData, title: ru ? "Метка изменённых" : "Edited Mark", label: value, sectionId: self.section, style: .blocks, action: {})
         case .channelsHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "CHANNELS", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "КАНАЛЫ" : "CHANNELS", sectionId: self.section)
         case let .collapseSimilarChannels(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Collapse Similar Channels", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.collapseSimilarChannels) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сворачивать похожие каналы" : "Collapse Similar Channels", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.collapseSimilarChannels) })
         case let .hideSimilarChannels(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Hide Similar Channels", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.hideSimilarChannels) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Скрывать похожие каналы" : "Hide Similar Channels", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.hideSimilarChannels) })
         case let .showOnlyAddedEmojisAndStickers(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Show Only Added Stickers & Emojis", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.showOnlyAddedEmojisAndStickers) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Только добавленные стикеры и эмодзи" : "Show Only Added Stickers & Emojis", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.showOnlyAddedEmojisAndStickers) })
         }
     }
 }
@@ -273,9 +275,11 @@ public func ayuGeneralController(context: AccountContext) -> ViewController {
     )
     |> deliverOnMainQueue
     |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let isRussian = presentationData.strings.baseLanguageCode == "ru"
+        arguments.isRussian = isRussian
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text("General"),
+            title: .text(isRussian ? "Основное" : "General"),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back)

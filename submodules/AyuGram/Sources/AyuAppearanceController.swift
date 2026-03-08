@@ -39,6 +39,7 @@ private struct AyuAppearanceState: Equatable {
 
 private final class AyuAppearanceArguments {
     let toggle: (AyuAppearanceSetting) -> Void
+    var isRussian: Bool = false
     init(toggle: @escaping (AyuAppearanceSetting) -> Void) {
         self.toggle = toggle
     }
@@ -105,27 +106,28 @@ private enum AyuAppearanceEntry: ItemListNodeEntry {
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
         let arguments = arguments as! AyuAppearanceArguments
+        let ru = arguments.isRussian
         switch self {
         case .messagesHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "MESSAGES", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "СООБЩЕНИЯ" : "MESSAGES", sectionId: self.section)
         case let .removeMessageTail(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Remove Message Tail", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.removeMessageTail) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Убрать хвост сообщения" : "Remove Message Tail", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.removeMessageTail) })
         case let .simpleQuotesAndReplies(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Simple Quotes & Replies", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.simpleQuotesAndReplies) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Простые цитаты и ответы" : "Simple Quotes & Replies", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.simpleQuotesAndReplies) })
         case let .adaptiveCoverColor(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Adaptive Cover Color", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.adaptiveCoverColor) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Адаптивный цвет обложки" : "Adaptive Cover Color", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.adaptiveCoverColor) })
         case .messagesFooter:
-            return ItemListTextItem(presentationData: presentationData, text: .plain("Customize the look of messages."), sectionId: self.section)
+            return ItemListTextItem(presentationData: presentationData, text: .plain(ru ? "Настройте внешний вид сообщений." : "Customize the look of messages."), sectionId: self.section)
         case .notificationsHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "NOTIFICATIONS", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "УВЕДОМЛЕНИЯ" : "NOTIFICATIONS", sectionId: self.section)
         case let .hideNotificationCounters(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Hide Notification Counters", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.hideNotificationCounters) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Скрыть счётчики уведомлений" : "Hide Notification Counters", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.hideNotificationCounters) })
         case let .hideNotificationBadge(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Hide App Badge", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.hideNotificationBadge) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Скрыть бейдж приложения" : "Hide App Badge", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.hideNotificationBadge) })
         case .chatsHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "CHATS", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ЧАТЫ" : "CHATS", sectionId: self.section)
         case let .hideAllChatsFolder(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Hide \"All Chats\" Folder", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.hideAllChatsFolder) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Скрыть папку «Все чаты»" : "Hide \"All Chats\" Folder", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.hideAllChatsFolder) })
         }
     }
 }
@@ -172,9 +174,11 @@ public func ayuAppearanceController(context: AccountContext) -> ViewController {
     )
     |> deliverOnMainQueue
     |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let isRussian = presentationData.strings.baseLanguageCode == "ru"
+        arguments.isRussian = isRussian
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text("Appearance"),
+            title: .text(isRussian ? "Внешний вид" : "Appearance"),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back)

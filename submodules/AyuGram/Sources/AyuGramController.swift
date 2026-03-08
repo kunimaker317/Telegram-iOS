@@ -125,43 +125,44 @@ private enum AyuGramEntry: ItemListNodeEntry {
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
         let args = arguments as! AyuGramArguments
+        let ru = args.isRussian
         switch self {
         case .ghostHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "GHOST ESSENTIALS", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "РЕЖИМ ПРИЗРАКА" : "GHOST ESSENTIALS", sectionId: self.section)
         case let .sendReadMessages(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Don't Read Messages", value: !v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendReadMessages) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Не читать сообщения" : "Don't Read Messages", value: !v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendReadMessages) })
         case let .sendReadStories(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Don't Read Stories", value: !v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendReadStories) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Не читать истории" : "Don't Read Stories", value: !v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendReadStories) })
         case let .sendOnlinePackets(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Don't Send Online", value: !v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendOnlinePackets) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Не отправлять статус онлайн" : "Don't Send Online", value: !v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendOnlinePackets) })
         case let .sendUploadProgress(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Don't Send Typing", value: !v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendUploadProgress) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Не отправлять прогресс загрузки" : "Don't Send Typing", value: !v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendUploadProgress) })
         case let .sendOfflinePacketAfterOnline(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Go Offline Automatically", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendOfflinePacketAfterOnline) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Отправлять оффлайн после онлайна" : "Go Offline Automatically", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendOfflinePacketAfterOnline) })
         case .ghostFooter:
-            return ItemListTextItem(presentationData: presentationData, text: .plain("Ghost mode hides your online activity from others."), sectionId: self.section)
+            return ItemListTextItem(presentationData: presentationData, text: .plain(ru ? "Режим призрака скрывает вашу онлайн-активность от других." : "Ghost mode hides your online activity from others."), sectionId: self.section)
         case .actionsHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "ACTIONS", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ДЕЙСТВИЯ" : "ACTIONS", sectionId: self.section)
         case let .markReadAfterAction(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Read on Interact", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.markReadAfterAction) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Отмечать прочитанным после действия" : "Read on Interact", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.markReadAfterAction) })
         case let .useScheduledMessages(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Schedule Messages", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.useScheduledMessages) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Отложенные сообщения" : "Schedule Messages", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.useScheduledMessages) })
         case let .sendWithoutSound(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Send without Sound", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendWithoutSound) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Отправлять без звука" : "Send without Sound", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.sendWithoutSound) })
         case .spyHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "SPY ESSENTIALS", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ШПИОНАЖ" : "SPY ESSENTIALS", sectionId: self.section)
         case let .saveDeletedMessages(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Save Deleted Messages", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.saveDeletedMessages) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сохранять удалённые сообщения" : "Save Deleted Messages", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.saveDeletedMessages) })
         case let .saveMessagesHistory(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Save Edits History", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.saveMessagesHistory) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сохранять историю изменений" : "Save Edits History", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.saveMessagesHistory) })
         case let .saveForBots(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Save in Bot Dialogs", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.saveForBots) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сохранять в диалогах ботов" : "Save in Bot Dialogs", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.saveForBots) })
         case .otherHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "OTHER", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ДРУГОЕ" : "OTHER", sectionId: self.section)
         case let .localPremium(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Local Telegram Premium", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.localPremium) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Локальный Telegram Premium" : "Local Telegram Premium", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.localPremium) })
         case let .disableAds(v):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Disable Ads", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.disableAds) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Отключить рекламу" : "Disable Ads", value: v, sectionId: self.section, style: .blocks, updated: { _ in args.toggle(.disableAds) })
         }
     }
 }
@@ -174,6 +175,7 @@ private enum AyuGramToggle {
 
 private final class AyuGramArguments {
     let toggle: (AyuGramToggle) -> Void
+    var isRussian: Bool = false
     init(toggle: @escaping (AyuGramToggle) -> Void) { self.toggle = toggle }
 }
 
@@ -234,6 +236,8 @@ public func ayuGramController(context: AccountContext) -> ViewController {
     )
     |> deliverOnMainQueue
     |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let isRussian = presentationData.strings.baseLanguageCode == "ru"
+        arguments.isRussian = isRussian
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
             title: .text("AyuGram Preferences"),

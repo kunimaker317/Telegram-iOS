@@ -32,6 +32,7 @@ private struct AyuOtherState: Equatable {
 private final class AyuOtherArguments {
     let setTranslationProvider: (String) -> Void
     let toggleCrashReporting: () -> Void
+    var isRussian: Bool = false
     init(
         setTranslationProvider: @escaping (String) -> Void,
         toggleCrashReporting: @escaping () -> Void
@@ -79,13 +80,14 @@ private enum AyuOtherEntry: ItemListNodeEntry {
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
         let arguments = arguments as! AyuOtherArguments
+        let ru = arguments.isRussian
         switch self {
         case .translationHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "TRANSLATION", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ПЕРЕВОД" : "TRANSLATION", sectionId: self.section)
         case let .translationProvider(value):
             return ItemListDisclosureItem(
                 presentationData: presentationData,
-                title: "Translation Provider",
+                title: ru ? "Провайдер перевода" : "Translation Provider",
                 label: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -95,11 +97,11 @@ private enum AyuOtherEntry: ItemListNodeEntry {
                 }
             )
         case .reportingHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "REPORTING", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ОТЧЁТЫ" : "REPORTING", sectionId: self.section)
         case let .crashReporting(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Crash Reporting", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleCrashReporting() })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Отчёты об ошибках" : "Crash Reporting", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleCrashReporting() })
         case .reportingFooter:
-            return ItemListTextItem(presentationData: presentationData, text: .plain("Help improve AyuGram by sending anonymous crash reports."), sectionId: self.section)
+            return ItemListTextItem(presentationData: presentationData, text: .plain(ru ? "Помогите улучшить AyuGram, отправляя анонимные отчёты об ошибках." : "Help improve AyuGram by sending anonymous crash reports."), sectionId: self.section)
         }
     }
 }
@@ -139,9 +141,11 @@ public func ayuOtherController(context: AccountContext) -> ViewController {
     )
     |> deliverOnMainQueue
     |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let isRussian = presentationData.strings.baseLanguageCode == "ru"
+        arguments.isRussian = isRussian
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text("Other"),
+            title: .text(isRussian ? "Другое" : "Other"),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back)

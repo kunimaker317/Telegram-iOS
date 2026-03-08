@@ -43,6 +43,7 @@ private struct AyuGhostState: Equatable {
 
 private final class AyuGhostArguments {
     let toggle: (AyuGhostSetting) -> Void
+    var isRussian: Bool = false
     init(toggle: @escaping (AyuGhostSetting) -> Void) {
         self.toggle = toggle
     }
@@ -112,17 +113,18 @@ private enum AyuGhostEntry: ItemListNodeEntry {
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
         let arguments = arguments as! AyuGhostArguments
+        let ru = arguments.isRussian
         switch self {
         case .essentialsHeader:
             return ItemListSectionHeaderItem(
                 presentationData: presentationData,
-                text: "GHOST ESSENTIALS",
+                text: ru ? "РЕЖИМ ПРИЗРАКА" : "GHOST ESSENTIALS",
                 sectionId: self.section
             )
         case let .sendReadMessages(value):
             return ItemListSwitchItem(
                 presentationData: presentationData,
-                title: "Don't Read Messages",
+                title: ru ? "Не читать сообщения" : "Don't Read Messages",
                 value: !value,
                 sectionId: self.section,
                 style: .blocks,
@@ -131,7 +133,7 @@ private enum AyuGhostEntry: ItemListNodeEntry {
         case let .sendReadStories(value):
             return ItemListSwitchItem(
                 presentationData: presentationData,
-                title: "Don't Read Stories",
+                title: ru ? "Не читать истории" : "Don't Read Stories",
                 value: !value,
                 sectionId: self.section,
                 style: .blocks,
@@ -140,7 +142,7 @@ private enum AyuGhostEntry: ItemListNodeEntry {
         case let .sendOnlinePackets(value):
             return ItemListSwitchItem(
                 presentationData: presentationData,
-                title: "Don't Send Online Status",
+                title: ru ? "Не отправлять статус онлайн" : "Don't Send Online Status",
                 value: !value,
                 sectionId: self.section,
                 style: .blocks,
@@ -149,7 +151,7 @@ private enum AyuGhostEntry: ItemListNodeEntry {
         case let .sendUploadProgress(value):
             return ItemListSwitchItem(
                 presentationData: presentationData,
-                title: "Don't Send Upload Progress",
+                title: ru ? "Не отправлять прогресс загрузки" : "Don't Send Upload Progress",
                 value: !value,
                 sectionId: self.section,
                 style: .blocks,
@@ -158,7 +160,7 @@ private enum AyuGhostEntry: ItemListNodeEntry {
         case let .sendOfflinePacketAfterOnline(value):
             return ItemListSwitchItem(
                 presentationData: presentationData,
-                title: "Send Offline After Online",
+                title: ru ? "Отправлять оффлайн после онлайна" : "Send Offline After Online",
                 value: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -167,19 +169,19 @@ private enum AyuGhostEntry: ItemListNodeEntry {
         case .essentialsFooter:
             return ItemListTextItem(
                 presentationData: presentationData,
-                text: .plain("Ghost mode hides your online activity from others."),
+                text: .plain(ru ? "Режим призрака скрывает вашу онлайн-активность от других." : "Ghost mode hides your online activity from others."),
                 sectionId: self.section
             )
         case .actionsHeader:
             return ItemListSectionHeaderItem(
                 presentationData: presentationData,
-                text: "ACTIONS",
+                text: ru ? "ДЕЙСТВИЯ" : "ACTIONS",
                 sectionId: self.section
             )
         case let .markReadAfterAction(value):
             return ItemListSwitchItem(
                 presentationData: presentationData,
-                title: "Mark Read After Action",
+                title: ru ? "Отмечать прочитанным после действия" : "Mark Read After Action",
                 value: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -188,7 +190,7 @@ private enum AyuGhostEntry: ItemListNodeEntry {
         case let .useScheduledMessages(value):
             return ItemListSwitchItem(
                 presentationData: presentationData,
-                title: "Use Scheduled Messages",
+                title: ru ? "Использовать отложенные сообщения" : "Use Scheduled Messages",
                 value: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -197,7 +199,7 @@ private enum AyuGhostEntry: ItemListNodeEntry {
         case let .sendWithoutSound(value):
             return ItemListSwitchItem(
                 presentationData: presentationData,
-                title: "Send Without Sound",
+                title: ru ? "Отправлять без звука" : "Send Without Sound",
                 value: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -260,6 +262,8 @@ public func ayuGhostController(context: AccountContext) -> ViewController {
     )
     |> deliverOnMainQueue
     |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let isRussian = presentationData.strings.baseLanguageCode == "ru"
+        arguments.isRussian = isRussian
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
             title: .text("AyuGram"),

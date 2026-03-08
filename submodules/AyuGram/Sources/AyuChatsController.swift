@@ -37,6 +37,7 @@ private struct AyuChatsState: Equatable {
 
 private final class AyuChatsArguments {
     let toggle: (AyuChatsSetting) -> Void
+    var isRussian: Bool = false
     init(toggle: @escaping (AyuChatsSetting) -> Void) {
         self.toggle = toggle
     }
@@ -91,21 +92,22 @@ private enum AyuChatsEntry: ItemListNodeEntry {
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
         let arguments = arguments as! AyuChatsArguments
+        let ru = arguments.isRussian
         switch self {
         case .notificationsHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "NOTIFICATIONS", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "УВЕДОМЛЕНИЯ" : "NOTIFICATIONS", sectionId: self.section)
         case let .disableNotificationsDelay(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Disable Notifications Delay", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.disableNotificationsDelay) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Отключить задержку уведомлений" : "Disable Notifications Delay", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.disableNotificationsDelay) })
         case .notificationsFooter:
-            return ItemListTextItem(presentationData: presentationData, text: .plain("Send notifications immediately without the standard delay."), sectionId: self.section)
+            return ItemListTextItem(presentationData: presentationData, text: .plain(ru ? "Отправлять уведомления немедленно без стандартной задержки." : "Send notifications immediately without the standard delay."), sectionId: self.section)
         case .confirmationHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: "SEND CONFIRMATION", sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "ПОДТВЕРЖДЕНИЕ ОТПРАВКИ" : "SEND CONFIRMATION", sectionId: self.section)
         case let .stickerConfirmation(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Confirm Before Sending Sticker", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.stickerConfirmation) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Подтверждать отправку стикера" : "Confirm Before Sending Sticker", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.stickerConfirmation) })
         case let .gifConfirmation(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Confirm Before Sending GIF", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.gifConfirmation) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Подтверждать отправку GIF" : "Confirm Before Sending GIF", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.gifConfirmation) })
         case let .voiceConfirmation(value):
-            return ItemListSwitchItem(presentationData: presentationData, title: "Confirm Before Sending Voice", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.voiceConfirmation) })
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Подтверждать отправку голосового" : "Confirm Before Sending Voice", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggle(.voiceConfirmation) })
         }
     }
 }
@@ -147,9 +149,11 @@ public func ayuChatsController(context: AccountContext) -> ViewController {
     )
     |> deliverOnMainQueue
     |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let isRussian = presentationData.strings.baseLanguageCode == "ru"
+        arguments.isRussian = isRussian
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text("Chats"),
+            title: .text(isRussian ? "Чаты" : "Chats"),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back)

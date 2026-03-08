@@ -27,6 +27,7 @@ private final class AyuGramSettingsArguments {
     let openChannel: () -> Void
     let openChat: () -> Void
     let openDocs: () -> Void
+    var isRussian: Bool = false
 
     init(
         openGhost: @escaping () -> Void,
@@ -103,11 +104,12 @@ private enum AyuGramEntry: ItemListNodeEntry {
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
         let arguments = arguments as! AyuGramSettingsArguments
+        let ru = arguments.isRussian
         switch self {
         case let .headerInfo(version):
             return ItemListTextItem(
                 presentationData: presentationData,
-                text: .plain("AyuGram iOS \(version)\nBased on Telegram"),
+                text: .plain("AyuGram iOS \(version)\n\(ru ? "На основе Telegram" : "Based on Telegram")"),
                 sectionId: self.section
             )
         case .ghost:
@@ -126,7 +128,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 icon: UIImage(systemName: "gearshape"),
-                title: "General",
+                title: ru ? "Основное" : "General",
                 label: "",
                 sectionId: self.section,
                 style: .blocks,
@@ -138,7 +140,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 icon: UIImage(systemName: "paintpalette"),
-                title: "Appearance",
+                title: ru ? "Внешний вид" : "Appearance",
                 label: "",
                 sectionId: self.section,
                 style: .blocks,
@@ -150,7 +152,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 icon: UIImage(systemName: "app.badge"),
-                title: "App Icon",
+                title: ru ? "Иконка" : "App Icon",
                 label: "",
                 sectionId: self.section,
                 style: .blocks,
@@ -162,7 +164,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 icon: UIImage(systemName: "bubble.left.and.bubble.right"),
-                title: "Chats",
+                title: ru ? "Чаты" : "Chats",
                 label: "",
                 sectionId: self.section,
                 style: .blocks,
@@ -174,7 +176,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 icon: UIImage(systemName: "ellipsis.circle"),
-                title: "Other",
+                title: ru ? "Другое" : "Other",
                 label: "",
                 sectionId: self.section,
                 style: .blocks,
@@ -185,14 +187,14 @@ private enum AyuGramEntry: ItemListNodeEntry {
         case .linksHeader:
             return ItemListSectionHeaderItem(
                 presentationData: presentationData,
-                text: "LINKS",
+                text: ru ? "ССЫЛКИ" : "LINKS",
                 sectionId: self.section
             )
         case .channelLink:
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 icon: UIImage(systemName: "megaphone"),
-                title: "Channel",
+                title: ru ? "Канал" : "Channel",
                 label: "@ayugram",
                 sectionId: self.section,
                 style: .blocks,
@@ -204,7 +206,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 icon: UIImage(systemName: "bubble.left.and.bubble.right"),
-                title: "Chat",
+                title: ru ? "Чат" : "Chat",
                 label: "@ayugramchat",
                 sectionId: self.section,
                 style: .blocks,
@@ -216,7 +218,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 icon: UIImage(systemName: "book"),
-                title: "Documentation",
+                title: ru ? "Документация" : "Documentation",
                 label: "docs.ayugram.one",
                 sectionId: self.section,
                 style: .blocks,
@@ -251,7 +253,7 @@ public func ayuGramSettingsController(context: AccountContext) -> ViewController
 
     let arguments = AyuGramSettingsArguments(
         openGhost: {
-            pushControllerImpl?(ayuGramController(context: context))
+            pushControllerImpl?(ayuGhostController(context: context))
         },
         openGeneral: {
             pushControllerImpl?(ayuGeneralController(context: context))
@@ -282,9 +284,11 @@ public func ayuGramSettingsController(context: AccountContext) -> ViewController
     let signal = context.sharedContext.presentationData
     |> deliverOnMainQueue
     |> map { presentationData -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let isRussian = presentationData.strings.baseLanguageCode == "ru"
+        arguments.isRussian = isRussian
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text("AyuGram Preferences"),
+            title: .text(isRussian ? "Настройки AyuGram" : "AyuGram Preferences"),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back)
