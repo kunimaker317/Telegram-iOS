@@ -3,6 +3,7 @@ import Postbox
 import SwiftSignalKit
 import TelegramApi
 import MtProtoKit
+import AyuGramCore
 
 
 public enum RequestEditMessageMedia : Equatable {
@@ -146,6 +147,17 @@ private func requestEditMessageInternal(accountPeerId: PeerId, postbox: Postbox,
         }
         |> mapError { _ -> RequestEditMessageInternalError in }
         |> mapToSignal { peer, message, associatedPeers -> Signal<RequestEditMessageResult, RequestEditMessageInternalError> in
+            // AyuGram: Save edit history before sending edit to server
+            if let message = message, !message.text.isEmpty, message.text != text {
+                AyuMessageStorage.shared.saveEditedMessage(
+                    messageId: messageId.id,
+                    peerId: messageId.peerId.id._internalGetInt64Value(),
+                    fromId: message.author.map { $0.id.id._internalGetInt64Value() },
+                    date: message.timestamp,
+                    prevText: message.text,
+                    newText: text
+                )
+            }
             if let peer = peer, let message = message, let inputPeer = apiInputPeer(peer) {
                 var flags: Int32 = 1 << 11
                 

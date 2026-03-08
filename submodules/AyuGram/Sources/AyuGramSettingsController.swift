@@ -232,7 +232,7 @@ public func ayuGramSettingsController(context: AccountContext) -> ViewController
 
     let arguments = AyuGramSettingsArguments(
         openGhost: {
-            pushControllerImpl?(ayuGhostController(context: context))
+            pushControllerImpl?(ayuGramController(context: context))
         },
         openGeneral: {
             pushControllerImpl?(ayuGeneralController(context: context))
