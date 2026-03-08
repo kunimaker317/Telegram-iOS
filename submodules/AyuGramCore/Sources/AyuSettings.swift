@@ -223,6 +223,13 @@ public final class AyuSettings {
         set { defaults.set(newValue, forKey: "crashReporting") }
     }
 
+    // MARK: - Privacy
+
+    public var allowScreenshots: Bool {
+        get { defaults.object(forKey: "allowScreenshots") as? Bool ?? false }
+        set { defaults.set(newValue, forKey: "allowScreenshots") }
+    }
+
     // MARK: - Ghost mode helper
 
     public var isGhostModeActive: Bool {

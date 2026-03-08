@@ -293,6 +293,10 @@ NSObject * _Nullable makeDisplacementMapFilter() {
 static const void *layerDisableScreenshotsKey = &layerDisableScreenshotsKey;
 
 void setLayerDisableScreenshots(CALayer * _Nonnull layer, bool disableScreenshots) {
+    // AyuGram: allow screenshots if user has enabled the setting
+    if (disableScreenshots && [[NSUserDefaults standardUserDefaults] boolForKey:@"allowScreenshots"]) {
+        disableScreenshots = false;
+    }
     static UITextField *textField = nil;
     static UIView *secureView = nil;
     static dispatch_once_t onceToken;
