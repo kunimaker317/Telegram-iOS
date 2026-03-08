@@ -1,4 +1,5 @@
 import Foundation
+import AyuGramCore
 import Postbox
 import TelegramApi
 import SwiftSignalKit
@@ -242,6 +243,10 @@ private func pushPeerReadState(network: Network, postbox: Postbox, stateManager:
             }
         }
     } else {
+        // AyuGram: Ghost mode — skip sending read receipts to server
+        if !AyuSettings.shared.sendReadMessages {
+            return .single(readState)
+        }
         return inputPeer(postbox: postbox, peerId: peerId)
         |> mapToSignal { inputPeer -> Signal<PeerReadState, PeerReadStateValidationError> in
             switch inputPeer {
