@@ -75,15 +75,41 @@ jobs:
             --target=Telegram
 
       # === ИСПРАВЛЕННЫЙ ШАГ УПАКОВКИ ===
-      - name: Package IPA
+      - name: Package IPA (Bulletproof)
         run: |
           mkdir -p Payload
-          # Ищем строго в папке bazel-bin, куда Bazel складывает результат
-          APP=$(find bazel-bin -type d -name "Telegram.app" | head -1)
-          echo "Found Telegram.app at: $APP"
-          cp -r "$APP" Payload/
-          zip -r Telegram.ipa Payload/
+          
+          echo "🔍 Начинаем поиск Telegram.app..."
+          
+          # СПОСОБ 1: Прямой путь (самый вероятный)
+          if [ -d "bazel-bin/Telegram/Telegram.app" ]; then
+            echo "✅ Нашел по прямому пути!"
+            APP_PATH="bazel-bin/Telegram/Telegram.app"
+          
+          # СПОСОБ 2: Поиск внутри bazel-bin с переходом по ссылкам
+          else
+            echo "⚠️ Прямой путь пуст. Ищу поиском в bazel-bin..."
+            APP_PATH=$(find -L bazel-bin -maxdepth 4 -name "Telegram.app" -type d | head -1)
+          fi
+          
+          # СПОСОБ 3: Поиск вообще везде (если первые два не сработали)
+          if [ -z "$APP_PATH" ]; then
+             echo "⚠️ В bazel-bin пусто. Ищу вообще везде (это может занять время)..."
+             APP_PATH=$(find . -maxdepth 10 -name "Telegram.app" -type d | grep -v "Source" | grep -v "bazel-Telegram" | head -1)
+          fi
 
+          # ФИНАЛ: Проверка
+          if [ -n "$APP_PATH" ]; then
+            echo "🎉 УРА! Приложение найдено здесь: $APP_PATH"
+            cp -r "$APP_PATH" Payload/
+            zip -r Telegram.ipa Payload/
+          else
+            echo "❌ КАТАСТРОФА. Файл не найден."
+            echo "📂 Вывожу структуру папок, чтобы понять, где он:"
+            # Эта команда покажет нам, какие папки есть, если всё сломается
+            find bazel-bin -maxdepth 3 -type d
+            exit 1
+          fi
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
