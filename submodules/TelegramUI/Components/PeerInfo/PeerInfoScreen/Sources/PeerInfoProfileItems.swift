@@ -13,6 +13,7 @@ import TelegramStringFormatting
 import AsyncDisplayKit
 import LocationResources
 import AttachmentUI
+import AyuGramCore
 import WebUI
 import AvatarNode
 import PeerNameColorItem
@@ -76,6 +77,7 @@ func infoItems(data: PeerInfoScreenData?, context: AccountContext, presentationD
         let ItemAbout = 3003
         let ItemNote = 3004
         let ItemAppFooter = 3005
+        let ItemPeerId = 3006
         let ItemAffiliate = 4000
         let ItemAffiliateInfo = 4001
         let ItemBusinessHours = 5000
@@ -171,7 +173,27 @@ func infoItems(data: PeerInfoScreenData?, context: AccountContext, presentationD
                 )
             )
         }
-        
+
+        // AyuGram: Show Peer ID
+        let showPeerIdMode = AyuSettings.shared.showPeerId
+        if showPeerIdMode > 0 {
+            let peerIdValue = user.id.id._internalGetInt64Value()
+            items[currentPeerInfoSection]!.append(
+                PeerInfoScreenLabeledValueItem(
+                    id: ItemPeerId,
+                    label: "ID",
+                    text: "\(peerIdValue)",
+                    textColor: .primary,
+                    action: { node, _ in
+                        UIPasteboard.general.string = "\(peerIdValue)"
+                    },
+                    requestLayout: { animated in
+                        interaction.requestLayout(animated)
+                    }
+                )
+            )
+        }
+
         if let cachedData = data.cachedData as? CachedUserData {
             if let birthday = cachedData.birthday {
                 var hasBirthdayToday = false

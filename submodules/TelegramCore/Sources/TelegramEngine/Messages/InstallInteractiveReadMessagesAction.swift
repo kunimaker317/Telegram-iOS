@@ -2,15 +2,21 @@ import Foundation
 import Postbox
 import TelegramApi
 import SwiftSignalKit
+import AyuGramCore
 
 func _internal_installInteractiveReadMessagesAction(postbox: Postbox, stateManager: AccountStateManager, peerId: PeerId, threadId: Int64?) -> Disposable {
     return postbox.installStoreMessageAction(peerId: peerId, { messages, transaction in
+        // AyuGram: Ghost mode — don't mark messages as read
+        if !AyuSettings.shared.sendReadMessages {
+            return
+        }
+
         var consumeMessageIds: [MessageId] = []
         var readReactionIds: [MessageId] = []
         readReactionIds.removeAll()
-        
+
         var readMessageIndexByNamespace: [MessageId.Namespace: MessageIndex] = [:]
-        
+
         for message in messages {
             if case let .Id(id) = message.id {
                 if threadId == nil || message.threadId == threadId {

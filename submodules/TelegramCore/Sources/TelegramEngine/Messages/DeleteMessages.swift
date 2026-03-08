@@ -2,6 +2,7 @@ import Foundation
 import Postbox
 import SwiftSignalKit
 import TelegramApi
+import AyuGramCore
 
 func addMessageMediaResourceIdsToRemove(media: Media, resourceIds: inout [MediaResourceId]) {
     if let image = media as? TelegramMediaImage {
@@ -49,6 +50,22 @@ public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBo
                         }
                     }
                 }
+            }
+        }
+    }
+    // AyuGram: Save deleted messages to history
+    if AyuSettings.shared.saveDeletedMessages {
+        for id in ids {
+            if let message = transaction.getMessage(id) {
+                let isBot = (message.author as? TelegramUser)?.botInfo != nil
+                if isBot && !AyuSettings.shared.saveForBots { continue }
+                AyuMessageStorage.shared.saveDeletedMessage(
+                    messageId: id.id,
+                    peerId: id.peerId.id._internalGetInt64Value(),
+                    fromId: message.author.map { $0.id.id._internalGetInt64Value() },
+                    date: message.timestamp,
+                    text: message.text
+                )
             }
         }
     }

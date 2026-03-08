@@ -248,6 +248,8 @@ swift_library(
         "//submodules/SparseItemGrid:SparseItemGrid",
         "//submodules/CalendarMessageScreen:CalendarMessageScreen",
         "//submodules/DirectMediaImageCache:DirectMediaImageCache",
+        "//submodules/AyuGram:AyuGram",
+        "//submodules/AyuGramCore:AyuGramCore",
         "//submodules/CodeInputView:CodeInputView",
         "//submodules/Components/ReactionButtonListComponent:ReactionButtonListComponent",
         "//submodules/InvisibleInkDustNode:InvisibleInkDustNode",

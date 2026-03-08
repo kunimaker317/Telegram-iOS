@@ -602,7 +602,7 @@ plist_fragment(
     template =
     """
     <key>CFBundleDisplayName</key>
-    <string>Telegram</string>
+    <string>AyuGram</string>
     """
 )
 

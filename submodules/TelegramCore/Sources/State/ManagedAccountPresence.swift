@@ -3,6 +3,7 @@ import TelegramApi
 import Postbox
 import SwiftSignalKit
 import MtProtoKit
+import AyuGramCore
 
 private typealias SignalKitTimer = SwiftSignalKit.Timer
 
@@ -43,6 +44,11 @@ private final class AccountPresenceManagerImpl {
     }
     
     private func updatePresence(_ isOnline: Bool) {
+        // AyuGram: Ghost mode — don't send online packets
+        if isOnline && !AyuSettings.shared.sendOnlinePackets {
+            return
+        }
+
         let request: Signal<Api.Bool, MTRpcError>
         if isOnline {
             let timer = SignalKitTimer(timeout: 30.0, repeat: false, completion: { [weak self] in

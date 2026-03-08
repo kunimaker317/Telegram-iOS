@@ -22,6 +22,7 @@ import AnimationCache
 import MultiAnimationRenderer
 import AppBundle
 import DirectMediaImageCache
+import AyuGramCore
 
 private final class DeviceSpecificContactImportContext {
     let disposable = MetaDisposable()
@@ -445,7 +446,8 @@ public final class AccountContextImpl: AccountContext {
             guard let self = self else {
                 return
             }
-            self.isPremium = isPremium
+            // AyuGram: Local Telegram Premium
+            self.isPremium = isPremium || AyuSettings.shared.localPremium
             self.userLimits = userLimits
         })
         
