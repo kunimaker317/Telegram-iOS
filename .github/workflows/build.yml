@@ -62,6 +62,26 @@ jobs:
         run: |
           python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
 
+      - name: Debug provisioning profiles
+        run: |
+          python3 - <<'EOF'
+          import plistlib, subprocess, os
+          profiles_dir = 'build-system/fake-codesigning/profiles'
+          for f in os.listdir(profiles_dir):
+              if not f.endswith('.mobileprovision'):
+                  continue
+              path = os.path.join(profiles_dir, f)
+              result = subprocess.run(['openssl', 'smime', '-inform', 'der', '-verify', '-noverify', '-in', path], capture_output=True)
+              if result.returncode != 0:
+                  print(f'{f}: openssl FAILED - {result.stderr.decode()}')
+                  continue
+              d = plistlib.loads(result.stdout)
+              ent = d.get('Entitlements', {})
+              app_id = ent.get('application-identifier', 'N/A')
+              aps = ent.get('aps-environment', 'NONE')
+              print(f'{f}: app-id={app_id}, aps={aps}')
+          EOF
+
       - name: Build Telegram
         run: |
           python3 build-system/Make/Make.py \
