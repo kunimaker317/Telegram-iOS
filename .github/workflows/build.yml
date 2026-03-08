@@ -48,7 +48,7 @@ jobs:
             "api_hash": "${{ secrets.TELEGRAM_API_HASH }}",
             "team_id": "U5X7796Z97",
             "app_center_id": "0",
-            "is_internal_build": "false",
+            "is_internal_build": "true",
             "is_appstore_build": "false",
             "appstore_id": "0",
             "app_specific_url_scheme": "tg",
