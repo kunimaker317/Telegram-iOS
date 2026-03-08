@@ -48,8 +48,7 @@ public final class AyuMessageStorage {
     private let containerURL: URL?
 
     private init() {
-        containerURL = FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: "group.ph.telegra.Telegraph")
+        containerURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
     }
 
     private func fileURL(_ name: String) -> URL? {

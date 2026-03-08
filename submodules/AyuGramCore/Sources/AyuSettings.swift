@@ -10,7 +10,7 @@ import Foundation
 public final class AyuSettings {
     public static let shared = AyuSettings()
 
-    private let defaults = UserDefaults(suiteName: "group.ph.telegra.Telegraph.ayu") ?? UserDefaults.standard
+    private let defaults = UserDefaults.standard
 
     private init() {}
 

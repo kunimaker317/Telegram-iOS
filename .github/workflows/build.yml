@@ -43,7 +43,7 @@ jobs:
         run: |
           cat > build_config.json << EOF
           {
-            "bundle_id": "ph.telegra.Telegraph",
+            "bundle_id": "ph.telegra.Telegraph.U5X7796Z97",
             "api_id": "${{ secrets.TELEGRAM_API_ID }}",
             "api_hash": "${{ secrets.TELEGRAM_API_HASH }}",
             "team_id": "U5X7796Z97",
