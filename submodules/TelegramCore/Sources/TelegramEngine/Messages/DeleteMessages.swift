@@ -53,23 +53,52 @@ public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBo
             }
         }
     }
-    // AyuGram: Save deleted messages to history
-    if AyuSettings.shared.saveDeletedMessages {
-        for id in ids {
-            if let message = transaction.getMessage(id) {
-                let isBot = (message.author as? TelegramUser)?.botInfo != nil
-                if isBot && !AyuSettings.shared.saveForBots { continue }
-                AyuMessageStorage.shared.saveDeletedMessage(
-                    messageId: id.id,
-                    peerId: id.peerId.id._internalGetInt64Value(),
-                    fromId: message.author.map { $0.id.id._internalGetInt64Value() },
-                    date: message.timestamp,
-                    text: message.text
-                )
-            }
+    // AyuGram: Soft-delete — keep messages visible in chat with a "deleted" marker
+    var idsToHardDelete: [MessageId] = []
+    for id in ids {
+        guard AyuSettings.shared.saveDeletedMessages else {
+            idsToHardDelete.append(id)
+            continue
+        }
+        guard let message = transaction.getMessage(id) else {
+            idsToHardDelete.append(id)
+            continue
+        }
+        // Skip messages already marked as deleted
+        if message.attributes.contains(where: { $0 is AyuSoftDeletedMessageAttribute }) {
+            idsToHardDelete.append(id)
+            continue
+        }
+        let isBot = (message.author as? TelegramUser)?.botInfo != nil
+        if isBot && !AyuSettings.shared.saveForBots {
+            idsToHardDelete.append(id)
+            continue
+        }
+        // Mark the message as soft-deleted in the database
+        transaction.updateMessage(id) { currentMessage in
+            var updatedAttributes = currentMessage.attributes
+            updatedAttributes.append(AyuSoftDeletedMessageAttribute())
+            return .update(StoreMessage(
+                id: currentMessage.id,
+                customStableId: nil,
+                globallyUniqueId: currentMessage.globallyUniqueId,
+                groupingKey: currentMessage.groupingKey,
+                threadId: currentMessage.threadId,
+                timestamp: currentMessage.timestamp,
+                flags: StoreMessageFlags(currentMessage.flags),
+                tags: currentMessage.tags,
+                globalTags: currentMessage.globalTags,
+                localTags: currentMessage.localTags,
+                forwardInfo: currentMessage.forwardInfo.map { StoreMessageForwardInfo($0) },
+                authorId: currentMessage.author?.id,
+                text: currentMessage.text,
+                attributes: updatedAttributes,
+                media: currentMessage.media
+            ))
         }
     }
-    transaction.deleteMessages(ids, forEachMedia: { _ in
+    // Only hard-delete messages that should not be kept
+    transaction.deleteMessages(idsToHardDelete, forEachMedia: { _ in
     })
 }
 

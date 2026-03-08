@@ -4,6 +4,7 @@ import AsyncDisplayKit
 import Display
 import TelegramCore
 import Postbox
+import AyuGramCore
 import TextFormat
 import UrlEscaping
 import TelegramUniversalVideoContent
@@ -310,6 +311,7 @@ public class ChatMessageTextBubbleContentNode: ChatMessageBubbleContentNode {
                 if item.attributes.updatingMedia != nil {
                     edited = true
                 }
+                let deleted = item.message.attributes.contains(where: { $0 is AyuSoftDeletedMessageAttribute })
                 var viewCount: Int?
                 var dateReplies = 0
                 var starsCount: Int64?
@@ -760,6 +762,7 @@ public class ChatMessageTextBubbleContentNode: ChatMessageBubbleContentNode {
                         context: item.context,
                         presentationData: item.presentationData,
                         edited: edited && !item.presentationData.isPreview,
+                        deleted: deleted,
                         impressionCount: !item.presentationData.isPreview ? viewCount : nil,
                         dateText: dateText,
                         type: statusType,

@@ -2,6 +2,8 @@ import Foundation
 import UIKit
 import Postbox
 import TelegramCore
+import AyuGramCore
+import AyuGram
 import AsyncDisplayKit
 import Display
 import UIKit
@@ -1918,6 +1920,20 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
                     }
                     context.sharedContext.navigateToChatController(NavigateToChatControllerParams(navigationController: navigationController, context: context, chatLocation: .peer(EnginePeer(peer)), subject: .message(id: .id(messages[0].id), highlight: ChatControllerSubject.MessageHighlight(quote: nil), timecode: nil, setupReply: false), useExisting: true))
                 })
+            })))
+        }
+
+        // AyuGram: Edit History button
+        if let historyAttr = message.attributes.first(where: { $0 is AyuMessageEditHistoryAttribute }) as? AyuMessageEditHistoryAttribute, !historyAttr.history.isEmpty {
+            actions.append(.action(ContextMenuActionItem(text: "Edit History", icon: { theme in
+                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Edit"), color: theme.actionSheet.primaryTextColor)
+            }, action: { c, f in
+                c?.dismiss(completion: {
+                    guard let navigationController = controllerInteraction.navigationController() else { return }
+                    let controller = ayuEditHistoryController(context: context, message: message)
+                    navigationController.pushViewController(controller)
+                })
+                f(.dismissWithoutContent)
             })))
         }
 

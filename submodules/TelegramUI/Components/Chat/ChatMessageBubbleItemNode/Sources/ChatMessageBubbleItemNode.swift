@@ -5,6 +5,7 @@ import Display
 import SwiftSignalKit
 import Postbox
 import TelegramCore
+import AyuGramCore
 import TelegramPresentationData
 import TelegramUIPreferences
 import TextFormat
@@ -2430,6 +2431,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
                 if item.content.firstMessageAttributes.updatingMedia != nil {
                     edited = true
                 }
+                let deleted = message.attributes.contains(where: { $0 is AyuSoftDeletedMessageAttribute })
                 var viewCount: Int?
                 var dateReplies = 0
                 var starsCount: Int64?
@@ -2487,6 +2489,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
                     context: item.context,
                     presentationData: item.presentationData,
                     edited: edited && !item.presentationData.isPreview,
+                    deleted: deleted,
                     impressionCount: !item.presentationData.isPreview ? viewCount : nil,
                     dateText: dateText,
                     type: statusType,

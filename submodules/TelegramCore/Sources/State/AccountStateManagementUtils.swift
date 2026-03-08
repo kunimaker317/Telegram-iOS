@@ -4,6 +4,7 @@ import SwiftSignalKit
 import TelegramApi
 import MtProtoKit
 import EncryptionProvider
+import AyuGramCore
 
 private func reactionGeneratedEvent(_ previousReactions: ReactionsMessageAttribute?, _ updatedReactions: ReactionsMessageAttribute?, message: Message, transaction: Transaction) -> (reactionAuthor: Peer, reaction: MessageReaction.Reaction, message: Message, timestamp: Int32)? {
     if let updatedReactions = updatedReactions, !message.flags.contains(.Incoming), message.id.peerId.namespace == Namespaces.Peer.CloudUser {
@@ -4475,7 +4476,18 @@ func replayFinalState(
                     if let previousPaidContent = previousMessage.media.first(where: { $0 is TelegramMediaPaidContent }) as? TelegramMediaPaidContent, case .full = previousPaidContent.extendedMedia.first {
                         updatedMedia = previousMessage.media
                     }
-                    
+
+                    // AyuGram: Save edit history
+                    if AyuSettings.shared.saveMessagesHistory && previousMessage.text != message.text && !previousMessage.text.isEmpty {
+                        let entry = AyuMessageEditEntry(text: previousMessage.text, timestamp: previousMessage.timestamp)
+                        if let existing = updatedAttributes.firstIndex(where: { $0 is AyuMessageEditHistoryAttribute }),
+                           let attr = updatedAttributes[existing] as? AyuMessageEditHistoryAttribute {
+                            updatedAttributes[existing] = AyuMessageEditHistoryAttribute(history: attr.history + [entry])
+                        } else {
+                            updatedAttributes.append(AyuMessageEditHistoryAttribute(history: [entry]))
+                        }
+                    }
+
                     return .update(message.withUpdatedLocalTags(updatedLocalTags).withUpdatedFlags(updatedFlags).withUpdatedAttributes(updatedAttributes).withUpdatedMedia(updatedMedia))
                 })
                 if let generatedEvent = generatedEvent {

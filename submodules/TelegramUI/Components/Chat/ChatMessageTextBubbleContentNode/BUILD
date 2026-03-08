@@ -38,6 +38,7 @@ swift_library(
         "//submodules/TelegramUI/Components/TextLoadingEffect",
         "//submodules/TelegramUI/Components/ChatControllerInteraction",
         "//submodules/TelegramUI/Components/InteractiveTextComponent",
+        "//submodules/AyuGramCore:AyuGramCore",
     ],
     visibility = [
         "//visibility:public",
