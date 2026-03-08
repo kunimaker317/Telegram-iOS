@@ -15,11 +15,13 @@ import PresentationDataUtils
 import AccountContext
 import AyuGramCore
 import SafariServices
+import SettingsUI
 
 private final class AyuGramSettingsArguments {
     let openGhost: () -> Void
     let openGeneral: () -> Void
     let openAppearance: () -> Void
+    let openAppIcons: () -> Void
     let openChats: () -> Void
     let openOther: () -> Void
     let openChannel: () -> Void
@@ -30,6 +32,7 @@ private final class AyuGramSettingsArguments {
         openGhost: @escaping () -> Void,
         openGeneral: @escaping () -> Void,
         openAppearance: @escaping () -> Void,
+        openAppIcons: @escaping () -> Void,
         openChats: @escaping () -> Void,
         openOther: @escaping () -> Void,
         openChannel: @escaping () -> Void,
@@ -39,6 +42,7 @@ private final class AyuGramSettingsArguments {
         self.openGhost = openGhost
         self.openGeneral = openGeneral
         self.openAppearance = openAppearance
+        self.openAppIcons = openAppIcons
         self.openChats = openChats
         self.openOther = openOther
         self.openChannel = openChannel
@@ -58,6 +62,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
     case ghost
     case general
     case appearance
+    case appIcons
     case chats
     case other
     case linksHeader
@@ -69,7 +74,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
         switch self {
         case .headerInfo:
             return AyuGramSection.header.rawValue
-        case .ghost, .general, .appearance, .chats, .other:
+        case .ghost, .general, .appearance, .appIcons, .chats, .other:
             return AyuGramSection.categories.rawValue
         case .linksHeader, .channelLink, .chatLink, .docsLink:
             return AyuGramSection.links.rawValue
@@ -82,12 +87,13 @@ private enum AyuGramEntry: ItemListNodeEntry {
         case .ghost: return 1
         case .general: return 2
         case .appearance: return 3
-        case .chats: return 4
-        case .other: return 5
-        case .linksHeader: return 6
-        case .channelLink: return 7
-        case .chatLink: return 8
-        case .docsLink: return 9
+        case .appIcons: return 4
+        case .chats: return 5
+        case .other: return 6
+        case .linksHeader: return 7
+        case .channelLink: return 8
+        case .chatLink: return 9
+        case .docsLink: return 10
         }
     }
 
@@ -138,6 +144,18 @@ private enum AyuGramEntry: ItemListNodeEntry {
                 style: .blocks,
                 action: {
                     arguments.openAppearance()
+                }
+            )
+        case .appIcons:
+            return ItemListDisclosureItem(
+                presentationData: presentationData,
+                icon: UIImage(systemName: "app.badge"),
+                title: "App Icon",
+                label: "",
+                sectionId: self.section,
+                style: .blocks,
+                action: {
+                    arguments.openAppIcons()
                 }
             )
         case .chats:
@@ -217,6 +235,7 @@ private func ayuGramEntries(presentationData: PresentationData) -> [AyuGramEntry
     entries.append(.ghost)
     entries.append(.general)
     entries.append(.appearance)
+    entries.append(.appIcons)
     entries.append(.chats)
     entries.append(.other)
     entries.append(.linksHeader)
@@ -240,6 +259,9 @@ public func ayuGramSettingsController(context: AccountContext) -> ViewController
         openAppearance: {
             pushControllerImpl?(ayuAppearanceController(context: context))
         },
+        openAppIcons: {
+            pushControllerImpl?(themeSettingsController(context: context))
+        },
         openChats: {
             pushControllerImpl?(ayuChatsController(context: context))
         },
@@ -262,7 +284,7 @@ public func ayuGramSettingsController(context: AccountContext) -> ViewController
     |> map { presentationData -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text("AyuGram"),
+            title: .text("AyuGram Preferences"),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back)
