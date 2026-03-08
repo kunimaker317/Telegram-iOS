@@ -64,9 +64,8 @@ public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBo
             idsToHardDelete.append(id)
             continue
         }
-        // Skip messages already marked as deleted
+        // Skip messages already marked as deleted — keep them visible
         if message.attributes.contains(where: { $0 is AyuSoftDeletedMessageAttribute }) {
-            idsToHardDelete.append(id)
             continue
         }
         let isBot = (message.author as? TelegramUser)?.botInfo != nil
