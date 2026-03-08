@@ -46,7 +46,7 @@ jobs:
             "bundle_id": "ph.telegra.Telegraph",
             "api_id": "${{ secrets.TELEGRAM_API_ID }}",
             "api_hash": "${{ secrets.TELEGRAM_API_HASH }}",
-            "team_id": "U5X7796Z97",
+            "team_id": "C67CF9S4VU",
             "app_center_id": "0",
             "is_internal_build": "true",
             "is_appstore_build": "false",
