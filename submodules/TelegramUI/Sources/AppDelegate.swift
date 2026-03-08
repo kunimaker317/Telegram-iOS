@@ -626,10 +626,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             |> runOn(Queue.mainQueue())
         }, autolockDeadine: autolockDeadine, encryptionProvider: OpenSSLEncryptionProvider(), deviceModelName: nil, useBetaFeatures: !buildConfig.isAppStoreBuild, isICloudEnabled: buildConfig.isICloudEnabled)
         
-        guard let appGroupUrl = maybeAppGroupUrl else {
-            self.mainWindow?.presentNative(UIAlertController(title: nil, message: "Error 2", preferredStyle: .alert))
-            return true
-        }
+        // AyuGram: fallback to Documents if app group is unavailable (sideloaded builds)
+        let appGroupUrl: URL = maybeAppGroupUrl ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         
         var isDebugConfiguration = false
         #if DEBUG
