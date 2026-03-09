@@ -79,6 +79,7 @@ private final class AyuGeneralArguments {
 enum AyuGeneralBoolSetting {
     case saveDeletedMessages
     case saveMessagesHistory
+    case saveOwnDeletedMessages
     case saveForBots
     case localPremium
     case disableAds
