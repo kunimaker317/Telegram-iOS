@@ -15,14 +15,26 @@ import PresentationDataUtils
 import AccountContext
 import AyuGramCore
 
+private struct AyuCustomNamesEntry {
+    let peerId: String
+    let name: String
+}
+
 private struct AyuCustomNamesState: Equatable {
-    var names: [(peerId: String, name: String)]
+    var names: [String: String]
+
+    static func == (lhs: AyuCustomNamesState, rhs: AyuCustomNamesState) -> Bool {
+        return lhs.names == rhs.names
+    }
 
     static func current() -> AyuCustomNamesState {
-        let sorted = AyuSettings.shared.customPeerNames
-            .sorted { $0.value.localizedCompare($1.value) == .orderedAscending }
-            .map { (peerId: $0.key, name: $0.value) }
-        return AyuCustomNamesState(names: sorted)
+        return AyuCustomNamesState(names: AyuSettings.shared.customPeerNames)
+    }
+
+    var sorted: [AyuCustomNamesEntry] {
+        return names
+            .map { AyuCustomNamesEntry(peerId: $0.key, name: $0.value) }
+            .sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
     }
 }
 
@@ -40,7 +52,7 @@ private enum AyuCustomNamesSection: Int32 {
     case empty
 }
 
-private enum AyuCustomNamesEntry: ItemListNodeEntry {
+private enum AyuCustomNamesListEntry: ItemListNodeEntry {
     case emptyState
     case nameItem(Int, String, String)
 
@@ -58,7 +70,7 @@ private enum AyuCustomNamesEntry: ItemListNodeEntry {
         }
     }
 
-    static func < (lhs: AyuCustomNamesEntry, rhs: AyuCustomNamesEntry) -> Bool {
+    static func < (lhs: AyuCustomNamesListEntry, rhs: AyuCustomNamesListEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
 
@@ -91,11 +103,12 @@ private enum AyuCustomNamesEntry: ItemListNodeEntry {
     }
 }
 
-private func customNamesEntries(state: AyuCustomNamesState) -> [AyuCustomNamesEntry] {
-    if state.names.isEmpty {
+private func customNamesEntries(state: AyuCustomNamesState) -> [AyuCustomNamesListEntry] {
+    let sorted = state.sorted
+    if sorted.isEmpty {
         return [.emptyState]
     }
-    return state.names.enumerated().map { .nameItem($0.offset, $0.element.peerId, $0.element.name) }
+    return sorted.enumerated().map { .nameItem($0.offset, $0.element.peerId, $0.element.name) }
 }
 
 public func ayuCustomNamesController(context: AccountContext) -> ViewController {
@@ -108,7 +121,9 @@ public func ayuCustomNamesController(context: AccountContext) -> ViewController 
 
     let arguments = AyuCustomNamesArguments(
         deleteName: { peerId in
-            AyuSettings.shared.setCustomName(nil, for: Int64(peerId) ?? 0)
+            if let id = Int64(peerId) {
+                AyuSettings.shared.setCustomName(nil, for: id)
+            }
             updateState { _ in AyuCustomNamesState.current() }
         }
     )
