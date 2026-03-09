@@ -63,6 +63,11 @@ public final class AyuSettings {
         set { defaults.set(newValue, forKey: "saveDeletedMessages") }
     }
 
+    public var saveOwnDeletedMessages: Bool {
+        get { defaults.object(forKey: "saveOwnDeletedMessages") as? Bool ?? false }
+        set { defaults.set(newValue, forKey: "saveOwnDeletedMessages") }
+    }
+
     public var saveMessagesHistory: Bool {
         get { defaults.object(forKey: "saveMessagesHistory") as? Bool ?? true }
         set { defaults.set(newValue, forKey: "saveMessagesHistory") }
@@ -71,6 +76,18 @@ public final class AyuSettings {
     public var saveForBots: Bool {
         get { defaults.object(forKey: "saveForBots") as? Bool ?? false }
         set { defaults.set(newValue, forKey: "saveForBots") }
+    }
+
+    // MARK: - AyuGram Notifications
+
+    public var ayuNotificationsEnabled: Bool {
+        get { defaults.object(forKey: "ayuNotificationsEnabled") as? Bool ?? false }
+        set { defaults.set(newValue, forKey: "ayuNotificationsEnabled") }
+    }
+
+    public var ayuNotificationShowContent: Bool {
+        get { defaults.object(forKey: "ayuNotificationShowContent") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "ayuNotificationShowContent") }
     }
 
     // MARK: - Filters

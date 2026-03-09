@@ -10,6 +10,7 @@ swift_library(
         "-warnings-as-errors",
     ],
     deps = [],
+    sdk_frameworks = ["UserNotifications"],
     visibility = [
         "//visibility:public",
     ],

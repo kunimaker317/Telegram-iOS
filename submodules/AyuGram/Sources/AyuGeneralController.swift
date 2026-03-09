@@ -19,6 +19,7 @@ import AyuGramCore
 private struct AyuGeneralState: Equatable {
     var saveDeletedMessages: Bool
     var saveMessagesHistory: Bool
+    var saveOwnDeletedMessages: Bool
     var saveForBots: Bool
     var localPremium: Bool
     var disableAds: Bool
@@ -30,12 +31,15 @@ private struct AyuGeneralState: Equatable {
     var collapseSimilarChannels: Bool
     var hideSimilarChannels: Bool
     var showOnlyAddedEmojisAndStickers: Bool
+    var ayuNotificationsEnabled: Bool
+    var ayuNotificationShowContent: Bool
 
     static func current() -> AyuGeneralState {
         let s = AyuSettings.shared
         return AyuGeneralState(
             saveDeletedMessages: s.saveDeletedMessages,
             saveMessagesHistory: s.saveMessagesHistory,
+            saveOwnDeletedMessages: s.saveOwnDeletedMessages,
             saveForBots: s.saveForBots,
             localPremium: s.localPremium,
             disableAds: s.disableAds,
@@ -46,7 +50,9 @@ private struct AyuGeneralState: Equatable {
             editedMark: s.editedMark,
             collapseSimilarChannels: s.collapseSimilarChannels,
             hideSimilarChannels: s.hideSimilarChannels,
-            showOnlyAddedEmojisAndStickers: s.showOnlyAddedEmojisAndStickers
+            showOnlyAddedEmojisAndStickers: s.showOnlyAddedEmojisAndStickers,
+            ayuNotificationsEnabled: s.ayuNotificationsEnabled,
+            ayuNotificationShowContent: s.ayuNotificationShowContent
         )
     }
 }
@@ -81,6 +87,8 @@ enum AyuGeneralBoolSetting {
     case collapseSimilarChannels
     case hideSimilarChannels
     case showOnlyAddedEmojisAndStickers
+    case ayuNotificationsEnabled
+    case ayuNotificationShowContent
 }
 
 private enum AyuGeneralSection: Int32 {
@@ -88,11 +96,13 @@ private enum AyuGeneralSection: Int32 {
     case premium
     case interface
     case channels
+    case notifications
 }
 
 private enum AyuGeneralEntry: ItemListNodeEntry {
     case historyHeader
     case saveDeletedMessages(Bool)
+    case saveOwnDeletedMessages(Bool)
     case saveMessagesHistory(Bool)
     case saveForBots(Bool)
     case historyFooter
@@ -112,10 +122,14 @@ private enum AyuGeneralEntry: ItemListNodeEntry {
     case collapseSimilarChannels(Bool)
     case hideSimilarChannels(Bool)
     case showOnlyAddedEmojisAndStickers(Bool)
+    case notificationsHeader
+    case ayuNotificationsEnabled(Bool)
+    case ayuNotificationShowContent(Bool)
+    case notificationsFooter
 
     var section: ItemListSectionId {
         switch self {
-        case .historyHeader, .saveDeletedMessages, .saveMessagesHistory, .saveForBots, .historyFooter:
+        case .historyHeader, .saveDeletedMessages, .saveOwnDeletedMessages, .saveMessagesHistory, .saveForBots, .historyFooter:
             return AyuGeneralSection.history.rawValue
         case .premiumHeader, .localPremium, .disableAds, .disableStories:
             return AyuGeneralSection.premium.rawValue
@@ -123,6 +137,8 @@ private enum AyuGeneralEntry: ItemListNodeEntry {
             return AyuGeneralSection.interface.rawValue
         case .channelsHeader, .collapseSimilarChannels, .hideSimilarChannels, .showOnlyAddedEmojisAndStickers:
             return AyuGeneralSection.channels.rawValue
+        case .notificationsHeader, .ayuNotificationsEnabled, .ayuNotificationShowContent, .notificationsFooter:
+            return AyuGeneralSection.notifications.rawValue
         }
     }
 
@@ -146,6 +162,11 @@ private enum AyuGeneralEntry: ItemListNodeEntry {
         case .collapseSimilarChannels: return 15
         case .hideSimilarChannels: return 16
         case .showOnlyAddedEmojisAndStickers: return 17
+        case .notificationsHeader: return 18
+        case .ayuNotificationsEnabled: return 19
+        case .ayuNotificationShowContent: return 20
+        case .notificationsFooter: return 21
+        case .saveOwnDeletedMessages: return 22
         }
     }
 
@@ -165,6 +186,8 @@ private enum AyuGeneralEntry: ItemListNodeEntry {
             return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сохранять изменённые сообщения" : "Save Edited Messages", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.saveMessagesHistory) })
         case let .saveForBots(value):
             return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сохранять историю для ботов" : "Save History for Bots", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.saveForBots) })
+        case let .saveOwnDeletedMessages(value):
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Сохранять удалённые мной" : "Save Messages Deleted by Me", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.saveOwnDeletedMessages) })
         case .historyFooter:
             return ItemListTextItem(presentationData: presentationData, text: .plain(ru ? "Хранит локальную копию удалённых и изменённых сообщений." : "Keeps a local copy of deleted and edited messages."), sectionId: self.section)
         case .premiumHeader:
@@ -203,6 +226,14 @@ private enum AyuGeneralEntry: ItemListNodeEntry {
             return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Скрывать похожие каналы" : "Hide Similar Channels", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.hideSimilarChannels) })
         case let .showOnlyAddedEmojisAndStickers(value):
             return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Только добавленные стикеры и эмодзи" : "Show Only Added Stickers & Emojis", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.showOnlyAddedEmojisAndStickers) })
+        case .notificationsHeader:
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: ru ? "УВЕДОМЛЕНИЯ AYUGRAM" : "AYUGRAM NOTIFICATIONS", sectionId: self.section)
+        case let .ayuNotificationsEnabled(value):
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Уведомления о действиях" : "Action Notifications", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.ayuNotificationsEnabled) })
+        case let .ayuNotificationShowContent(value):
+            return ItemListSwitchItem(presentationData: presentationData, title: ru ? "Показывать текст сообщения" : "Show Message Content", value: value, sectionId: self.section, style: .blocks, updated: { _ in arguments.toggleBool(.ayuNotificationShowContent) })
+        case .notificationsFooter:
+            return ItemListTextItem(presentationData: presentationData, text: .plain(ru ? "Уведомляет когда кто-то удалил или изменил сообщение." : "Notifies when a message is deleted or edited."), sectionId: self.section)
         }
     }
 }
@@ -211,6 +242,7 @@ private func generalEntries(state: AyuGeneralState) -> [AyuGeneralEntry] {
     return [
         .historyHeader,
         .saveDeletedMessages(state.saveDeletedMessages),
+        .saveOwnDeletedMessages(state.saveOwnDeletedMessages),
         .saveMessagesHistory(state.saveMessagesHistory),
         .saveForBots(state.saveForBots),
         .historyFooter,
@@ -227,6 +259,10 @@ private func generalEntries(state: AyuGeneralState) -> [AyuGeneralEntry] {
         .collapseSimilarChannels(state.collapseSimilarChannels),
         .hideSimilarChannels(state.hideSimilarChannels),
         .showOnlyAddedEmojisAndStickers(state.showOnlyAddedEmojisAndStickers),
+        .notificationsHeader,
+        .ayuNotificationsEnabled(state.ayuNotificationsEnabled),
+        .ayuNotificationShowContent(state.ayuNotificationShowContent),
+        .notificationsFooter,
     ]
 }
 
@@ -252,6 +288,9 @@ public func ayuGeneralController(context: AccountContext) -> ViewController {
             case .collapseSimilarChannels: s.collapseSimilarChannels = !s.collapseSimilarChannels
             case .hideSimilarChannels: s.hideSimilarChannels = !s.hideSimilarChannels
             case .showOnlyAddedEmojisAndStickers: s.showOnlyAddedEmojisAndStickers = !s.showOnlyAddedEmojisAndStickers
+            case .ayuNotificationsEnabled: s.ayuNotificationsEnabled = !s.ayuNotificationsEnabled
+            case .ayuNotificationShowContent: s.ayuNotificationShowContent = !s.ayuNotificationShowContent
+            case .saveOwnDeletedMessages: s.saveOwnDeletedMessages = !s.saveOwnDeletedMessages
             }
             updateState { _ in AyuGeneralState.current() }
         },

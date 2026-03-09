@@ -23,7 +23,7 @@ func addMessageMediaResourceIdsToRemove(message: Message, resourceIds: inout [Me
     }
 }
 
-public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBox, ids: [MessageId], deleteMedia: Bool = true, manualAddMessageThreadStatsDifference: ((MessageThreadKey, Int, Int) -> Void)? = nil) {
+public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBox, ids: [MessageId], isOwnDeletion: Bool = false, deleteMedia: Bool = true, manualAddMessageThreadStatsDifference: ((MessageThreadKey, Int, Int) -> Void)? = nil) {
     var resourceIds: [MediaResourceId] = []
     if deleteMedia {
         for id in ids {
@@ -56,7 +56,8 @@ public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBo
     // AyuGram: Soft-delete — keep messages visible in chat with a "deleted" marker
     var idsToHardDelete: [MessageId] = []
     for id in ids {
-        guard AyuSettings.shared.saveDeletedMessages else {
+        let shouldSave = isOwnDeletion ? AyuSettings.shared.saveOwnDeletedMessages : AyuSettings.shared.saveDeletedMessages
+        guard shouldSave else {
             idsToHardDelete.append(id)
             continue
         }
@@ -73,6 +74,30 @@ public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBo
             idsToHardDelete.append(id)
             continue
         }
+        // Log deletion event for AyuGram notification journal
+        let ayuChatPeer = transaction.getPeer(id.peerId)
+        let ayuChatName: String
+        if let user = ayuChatPeer as? TelegramUser {
+            ayuChatName = [user.firstName, user.lastName].compactMap { $0 }.joined(separator: " ")
+        } else if let group = ayuChatPeer as? TelegramGroup {
+            ayuChatName = group.title
+        } else if let channel = ayuChatPeer as? TelegramChannel {
+            ayuChatName = channel.title
+        } else {
+            ayuChatName = "Unknown"
+        }
+        let ayuSenderName: String
+        if let user = message.author as? TelegramUser {
+            ayuSenderName = [user.firstName, user.lastName].compactMap { $0 }.joined(separator: " ")
+        } else {
+            ayuSenderName = message.author?.debugDisplayTitle ?? "Unknown"
+        }
+        AyuNotificationLog.shared.log(
+            type: .deleted,
+            chatName: ayuChatName,
+            senderName: ayuSenderName,
+            messageText: message.text.isEmpty ? nil : message.text
+        )
         // Mark the message as soft-deleted in the database
         transaction.updateMessage(id) { currentMessage in
             var updatedAttributes = currentMessage.attributes
