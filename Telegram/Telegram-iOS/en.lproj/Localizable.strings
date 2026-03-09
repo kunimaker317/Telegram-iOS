@@ -457,8 +457,8 @@
 "Login.SelectCountry.Title" = "Country";
 
 // Dialog List
-"DialogList.TabTitle" = "Chats";
-"DialogList.Title" = "Chats";
+"DialogList.TabTitle" = "AyuGram";
+"DialogList.Title" = "AyuGram";
 "DialogList.SearchLabel" = "Search for messages or users";
 "DialogList.SearchLabelCompact" = "Search";
 "DialogList.NoMessagesTitle" = "You have no conversations yet";
