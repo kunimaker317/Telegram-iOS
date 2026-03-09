@@ -27,6 +27,7 @@ import PremiumUI
 import MediaPlaybackHeaderPanelComponent
 import LiveLocationHeaderPanelComponent
 import ChatListHeaderNoticeComponent
+import AyuGramCore
 import ChatListFilterTabContainerNode
 
 public enum ChatListContainerNodeFilter: Equatable {
@@ -2361,6 +2362,9 @@ final class ChatListControllerNode: ASDisplayNode, ASGestureRecognizerDelegate {
 }
 
 func shouldDisplayStoriesInChatListHeader(storySubscriptions: EngineStorySubscriptions, isHidden: Bool) -> Bool {
+    if AyuSettings.shared.disableStories {
+        return false
+    }
     if !storySubscriptions.items.isEmpty {
         return true
     }

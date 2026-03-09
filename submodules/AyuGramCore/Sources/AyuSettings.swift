@@ -240,6 +240,49 @@ public final class AyuSettings {
         set { defaults.set(newValue, forKey: "crashReporting") }
     }
 
+    // MARK: - Custom Peer Names
+
+    public var customPeerNames: [String: String] {
+        get { defaults.object(forKey: "customPeerNames") as? [String: String] ?? [:] }
+        set { defaults.set(newValue, forKey: "customPeerNames") }
+    }
+
+    public func customName(for peerId: Int64) -> String? {
+        return customPeerNames["\(peerId)"]
+    }
+
+    public func setCustomName(_ name: String?, for peerId: Int64) {
+        var names = customPeerNames
+        if let name = name, !name.isEmpty {
+            names["\(peerId)"] = name
+        } else {
+            names.removeValue(forKey: "\(peerId)")
+        }
+        customPeerNames = names
+    }
+
+    // MARK: - Chat Interaction Customization
+
+    public var customTypingText: String {
+        get { defaults.object(forKey: "customTypingText") as? String ?? "" }
+        set { defaults.set(newValue, forKey: "customTypingText") }
+    }
+
+    public var customRecordingText: String {
+        get { defaults.object(forKey: "customRecordingText") as? String ?? "" }
+        set { defaults.set(newValue, forKey: "customRecordingText") }
+    }
+
+    public var customUploadingText: String {
+        get { defaults.object(forKey: "customUploadingText") as? String ?? "" }
+        set { defaults.set(newValue, forKey: "customUploadingText") }
+    }
+
+    public var customOnlineText: String {
+        get { defaults.object(forKey: "customOnlineText") as? String ?? "" }
+        set { defaults.set(newValue, forKey: "customOnlineText") }
+    }
+
     // MARK: - Ghost mode helper
 
     public var isGhostModeActive: Bool {

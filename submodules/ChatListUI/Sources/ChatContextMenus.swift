@@ -16,6 +16,7 @@ import TelegramPresentationData
 import TelegramStringFormatting
 import ChatTimerScreen
 import NotificationPeerExceptionController
+import AyuGramCore
 
 func archiveContextMenuItems(context: AccountContext, groupId: PeerGroupId, chatListController: ChatListControllerImpl?) -> Signal<[ContextMenuItem], NoError> {
     let presentationData = context.sharedContext.currentPresentationData.with({ $0 })
@@ -574,6 +575,39 @@ func chatContextMenuItems(context: AccountContext, peerId: PeerId, promoInfo: Ch
                                  break
                             }
                         }
+                    }
+
+                    // AyuGram: Custom Name option for direct peers
+                    if case .user = peer {
+                        let isRu = presentationData.strings.baseLanguageCode == "ru"
+                        let peerIntId = peer.id.id._internalGetInt64Value()
+                        let hasCustomName = AyuSettings.shared.customName(for: peerIntId) != nil
+                        let labelText = isRu ? (hasCustomName ? "Изменить псевдоним" : "Задать псевдоним") : (hasCustomName ? "Change Custom Name" : "Set Custom Name")
+                        items.append(.separator)
+                        items.append(.action(ContextMenuActionItem(
+                            text: labelText,
+                            icon: { theme in generateTintedImage(image: UIImage(systemName: "person.badge.plus"), color: theme.contextMenu.primaryColor) },
+                            action: { [weak chatListController] _, f in
+                                f(.dismissWithoutContent)
+                                guard let chatListController = chatListController else { return }
+                                let currentName = AyuSettings.shared.customName(for: peerIntId) ?? ""
+                                let alertController = UIAlertController(
+                                    title: labelText,
+                                    message: isRu ? "Оставьте пустым, чтобы сбросить" : "Leave empty to reset",
+                                    preferredStyle: .alert
+                                )
+                                alertController.addTextField { textField in
+                                    textField.text = currentName
+                                    textField.clearButtonMode = .whileEditing
+                                }
+                                alertController.addAction(UIAlertAction(title: isRu ? "Отмена" : "Cancel", style: .cancel))
+                                alertController.addAction(UIAlertAction(title: isRu ? "Сохранить" : "Save", style: .default) { _ in
+                                    let value = alertController.textFields?.first?.text ?? ""
+                                    AyuSettings.shared.setCustomName(value.isEmpty ? nil : value, for: peerIntId)
+                                })
+                                chatListController.present(alertController, animated: true)
+                            }
+                        )))
                     }
 
                     if let item = items.last, case .separator = item {

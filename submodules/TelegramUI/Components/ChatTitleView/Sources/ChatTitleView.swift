@@ -14,6 +14,7 @@ import PeerPresenceStatusManager
 import ChatTitleActivityNode
 import LocalizedPeerData
 import PhoneNumberFormat
+import AyuGramCore
 import AnimatedCountLabelNode
 import AccountContext
 import ComponentFlow
@@ -294,7 +295,10 @@ public final class ChatTitleView: UIView, NavigationBarTitleView {
                                 } else if peerView.peerId.isAnonymousSavedMessages {
                                     segments = [.text(0, NSAttributedString(string: self.strings.ChatList_AuthorHidden, font: titleFont, textColor: titleTheme.rootController.navigationBar.primaryTextColor))]
                                 } else {
-                                    if !peerView.isContact, let user = peer as? TelegramUser, !user.flags.contains(.isSupport), user.botInfo == nil, let phone = user.phone, !phone.isEmpty {
+                                    let customName = AyuSettings.shared.customName(for: peer.id.id._internalGetInt64Value())
+                                    if let customName = customName {
+                                        segments = [.text(0, NSAttributedString(string: customName, font: titleFont, textColor: titleTheme.rootController.navigationBar.primaryTextColor))]
+                                    } else if !peerView.isContact, let user = peer as? TelegramUser, !user.flags.contains(.isSupport), user.botInfo == nil, let phone = user.phone, !phone.isEmpty {
                                         segments = [.text(0, NSAttributedString(string: formatPhoneNumber(context: self.context, number: phone), font: titleFont, textColor: titleTheme.rootController.navigationBar.primaryTextColor))]
                                     } else {
                                         segments = [.text(0, NSAttributedString(string: EnginePeer(peer).displayTitle(strings: self.strings, displayOrder: self.nameDisplayOrder), font: titleFont, textColor: titleTheme.rootController.navigationBar.primaryTextColor))]
@@ -546,11 +550,14 @@ public final class ChatTitleView: UIView, NavigationBarTitleView {
                 if inputActivities.peerId.namespace == Namespaces.Peer.CloudUser || inputActivities.peerId.namespace == Namespaces.Peer.SecretChat {
                     switch mergedActivity {
                     case .typingText:
-                        stringValue = strings.Conversation_typing
+                        let custom = AyuSettings.shared.customTypingText
+                        stringValue = custom.isEmpty ? strings.Conversation_typing : custom
                     case .uploadingFile:
-                        stringValue = strings.Activity_UploadingDocument
+                        let custom = AyuSettings.shared.customUploadingText
+                        stringValue = custom.isEmpty ? strings.Activity_UploadingDocument : custom
                     case .recordingVoice:
-                        stringValue = strings.Activity_RecordingAudio
+                        let custom = AyuSettings.shared.customRecordingText
+                        stringValue = custom.isEmpty ? strings.Activity_RecordingAudio : custom
                     case .uploadingPhoto:
                         stringValue = strings.Activity_UploadingPhoto
                     case .uploadingVideo:

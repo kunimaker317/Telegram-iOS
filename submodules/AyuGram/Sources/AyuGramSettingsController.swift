@@ -25,6 +25,7 @@ private final class AyuGramSettingsArguments {
     let openChats: () -> Void
     let openOther: () -> Void
     let openJournal: () -> Void
+    let openCustomization: () -> Void
     let openChannel: () -> Void
     let openChat: () -> Void
     let openDocs: () -> Void
@@ -38,6 +39,7 @@ private final class AyuGramSettingsArguments {
         openChats: @escaping () -> Void,
         openOther: @escaping () -> Void,
         openJournal: @escaping () -> Void,
+        openCustomization: @escaping () -> Void,
         openChannel: @escaping () -> Void,
         openChat: @escaping () -> Void,
         openDocs: @escaping () -> Void
@@ -49,6 +51,7 @@ private final class AyuGramSettingsArguments {
         self.openChats = openChats
         self.openOther = openOther
         self.openJournal = openJournal
+        self.openCustomization = openCustomization
         self.openChannel = openChannel
         self.openChat = openChat
         self.openDocs = openDocs
@@ -70,6 +73,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
     case chats
     case other
     case journal
+    case customization
     case linksHeader
     case channelLink
     case chatLink
@@ -81,7 +85,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
             return AyuGramSection.header.rawValue
         case .ghost, .general, .appearance, .appIcons, .chats, .other:
             return AyuGramSection.categories.rawValue
-        case .journal:
+        case .journal, .customization:
             return AyuGramSection.categories.rawValue
         case .linksHeader, .channelLink, .chatLink, .docsLink:
             return AyuGramSection.links.rawValue
@@ -98,6 +102,7 @@ private enum AyuGramEntry: ItemListNodeEntry {
         case .chats: return 5
         case .other: return 6
         case .journal: return 11
+        case .customization: return 12
         case .linksHeader: return 7
         case .channelLink: return 8
         case .chatLink: return 9
@@ -203,6 +208,18 @@ private enum AyuGramEntry: ItemListNodeEntry {
                     arguments.openJournal()
                 }
             )
+        case .customization:
+            return ItemListDisclosureItem(
+                presentationData: presentationData,
+                icon: UIImage(systemName: "slider.horizontal.3"),
+                title: ru ? "Кастомизация" : "Customization",
+                label: "",
+                sectionId: self.section,
+                style: .blocks,
+                action: {
+                    arguments.openCustomization()
+                }
+            )
         case .linksHeader:
             return ItemListSectionHeaderItem(
                 presentationData: presentationData,
@@ -260,6 +277,7 @@ private func ayuGramEntries(presentationData: PresentationData) -> [AyuGramEntry
     entries.append(.chats)
     entries.append(.other)
     entries.append(.journal)
+    entries.append(.customization)
     entries.append(.linksHeader)
     entries.append(.channelLink)
     entries.append(.chatLink)
@@ -292,6 +310,9 @@ public func ayuGramSettingsController(context: AccountContext) -> ViewController
         },
         openJournal: {
             pushControllerImpl?(ayuGramJournalController(context: context))
+        },
+        openCustomization: {
+            pushControllerImpl?(ayuCustomizationController(context: context))
         },
         openChannel: {
             openUrlImpl?("https://t.me/ayugram")

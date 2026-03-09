@@ -19,6 +19,7 @@ import ContextUI
 import ChatInterfaceState
 import TextFormat
 import InvisibleInkDustNode
+import AyuGramCore
 import GalleryUI
 import HierarchyTrackingLayer
 import TextNodeWithEntities
@@ -3100,7 +3101,10 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                         if customMessageListData.commandPrefix != nil {
                             titleAttributedString = nil
                         } else {
-                            if let displayTitle = itemPeer.chatOrMonoforumMainPeer?.displayTitle(strings: item.presentationData.strings, displayOrder: item.presentationData.nameDisplayOrder) {
+                            if var displayTitle = itemPeer.chatOrMonoforumMainPeer?.displayTitle(strings: item.presentationData.strings, displayOrder: item.presentationData.nameDisplayOrder) {
+                                if let mainPeer = itemPeer.chatMainPeer, let customName = AyuSettings.shared.customName(for: mainPeer.id.id._internalGetInt64Value()) {
+                                    displayTitle = customName
+                                }
                                 let textColor: UIColor
                                 if case let .chatList(index) = item.index, index.messageIndex.id.peerId.namespace == Namespaces.Peer.SecretChat {
                                     textColor = theme.secretTitleColor

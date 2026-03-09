@@ -7,6 +7,7 @@ import TelegramStringFormatting
 import TextFormat
 import LocalizedPeerData
 import AccountContext
+import AyuGramCore
 
 public enum MessageTimestampStatusFormat {
     case full
@@ -91,7 +92,7 @@ public func stringForMessageTimestampStatus(accountPeerId: PeerId, message: Mess
         timestamp = orignalDate
     }
     
-    var dateText = stringForMessageTimestamp(timestamp: timestamp, dateTimeFormat: dateTimeFormat)
+    var dateText = stringForMessageTimestamp(timestamp: timestamp, dateTimeFormat: dateTimeFormat, withSeconds: AyuSettings.shared.showMessageSeconds)
     if timestamp == scheduleWhenOnlineTimestamp {
         dateText = "         "
     }

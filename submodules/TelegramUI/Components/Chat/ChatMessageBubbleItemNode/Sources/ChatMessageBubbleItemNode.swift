@@ -3749,11 +3749,11 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         if hideBackground {
             backgroundType = .none
         } else if !incoming {
-            backgroundType = .outgoing(mergeType)
+            backgroundType = .outgoing(AyuSettings.shared.removeMessageTail ? .Extracted : mergeType)
         } else {
             if case let .messageOptions(_, _, info) = item.associatedData.subject, case let .link(link) = info, link.isCentered {
                 backgroundType = .incoming(.Extracted)
-            } else if !item.presentationData.chatBubbleCorners.hasTails {
+            } else if !item.presentationData.chatBubbleCorners.hasTails || AyuSettings.shared.removeMessageTail {
                 backgroundType = .incoming(.Extracted)
             } else {
                 backgroundType = .incoming(mergeType)

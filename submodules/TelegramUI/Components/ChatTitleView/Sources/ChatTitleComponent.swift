@@ -10,6 +10,7 @@ import TelegramCore
 import PeerPresenceStatusManager
 import ChatTitleActivityNode
 import AnimatedTextComponent
+import AyuGramCore
 import PhoneNumberFormat
 import TelegramStringFormatting
 import EmojiStatusComponent
@@ -653,11 +654,14 @@ public final class ChatTitleComponent: Component {
                     if inputActivities.peerId.namespace == Namespaces.Peer.CloudUser || inputActivities.peerId.namespace == Namespaces.Peer.SecretChat {
                         switch mergedActivity {
                         case .typingText:
-                            stringValue = component.strings.Conversation_typing
+                            let custom = AyuSettings.shared.customTypingText
+                            stringValue = custom.isEmpty ? component.strings.Conversation_typing : custom
                         case .uploadingFile:
-                            stringValue = component.strings.Activity_UploadingDocument
+                            let custom = AyuSettings.shared.customUploadingText
+                            stringValue = custom.isEmpty ? component.strings.Activity_UploadingDocument : custom
                         case .recordingVoice:
-                            stringValue = component.strings.Activity_RecordingAudio
+                            let custom = AyuSettings.shared.customRecordingText
+                            stringValue = custom.isEmpty ? component.strings.Activity_RecordingAudio : custom
                         case .uploadingPhoto:
                             stringValue = component.strings.Activity_UploadingPhoto
                         case .uploadingVideo:

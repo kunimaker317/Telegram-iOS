@@ -7,6 +7,7 @@ import SwiftSignalKit
 import TelegramPresentationData
 import ChatTitleActivityNode
 import LocalizedPeerData
+import AyuGramCore
 
 final class ChatListInputActivitiesNode: ASDisplayNode {
     private let activityNode: ChatTitleActivityNode
@@ -49,15 +50,18 @@ final class ChatListInputActivitiesNode: ASDisplayNode {
                             case .uploadingPhoto:
                                 text = strings.Activity_UploadingPhoto
                             case .uploadingFile:
-                                text = strings.Activity_UploadingDocument
+                                let customU = AyuSettings.shared.customUploadingText
+                                text = customU.isEmpty ? strings.Activity_UploadingDocument : customU
                             case .recordingVoice:
-                                text = strings.Activity_RecordingAudio
+                                let customR = AyuSettings.shared.customRecordingText
+                                text = customR.isEmpty ? strings.Activity_RecordingAudio : customR
                             case .recordingInstantVideo:
                                 text = strings.Activity_RecordingVideoMessage
                             case .playingGame:
                                 text = strings.Activity_PlayingGame
                             case .typingText:
-                                text = strings.DialogList_Typing
+                                let customT = AyuSettings.shared.customTypingText
+                                text = customT.isEmpty ? strings.DialogList_Typing : customT
                             case .choosingSticker:
                                 text = strings.Activity_ChoosingSticker
                             case let .interactingWithEmoji(emoticon, _, _):
