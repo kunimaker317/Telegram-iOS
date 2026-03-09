@@ -95,27 +95,27 @@ public final class AyuNotificationLog {
         let content = UNMutableNotificationContent()
         content.title = "AyuGram"
 
-        let isRu = Locale.current.language.languageCode?.identifier == "ru"
+        let isRu = Locale.current.languageCode == "ru"
 
         switch type {
         case .deleted:
             if showContent, let text = messageText, !text.isEmpty {
                 content.body = isRu
-                    ? "\(senderName) удалил(а): \"\(text)\""
+                    ? "\(senderName) \u{443}\u{434}\u{430}\u{43B}\u{438}\u{43B}(\u{430}): \"\(text)\""
                     : "\(senderName) deleted: \"\(text)\""
             } else {
                 content.body = isRu
-                    ? "\(senderName) удалил(а) сообщение в \(chatName)"
+                    ? "\(senderName) \u{443}\u{434}\u{430}\u{43B}\u{438}\u{43B}(\u{430}) \u{441}\u{43E}\u{43E}\u{431}\u{449}\u{435}\u{43D}\u{438}\u{435} \u{432} \(chatName)"
                     : "\(senderName) deleted a message in \(chatName)"
             }
         case .edited:
             if showContent, let text = messageText, !text.isEmpty {
                 content.body = isRu
-                    ? "\(senderName) изменил(а): \"\(text)\""
+                    ? "\(senderName) \u{438}\u{437}\u{43C}\u{435}\u{43D}\u{438}\u{43B}(\u{430}): \"\(text)\""
                     : "\(senderName) edited: \"\(text)\""
             } else {
                 content.body = isRu
-                    ? "\(senderName) изменил(а) сообщение в \(chatName)"
+                    ? "\(senderName) \u{438}\u{437}\u{43C}\u{435}\u{43D}\u{438}\u{43B}(\u{430}) \u{441}\u{43E}\u{43E}\u{431}\u{449}\u{435}\u{43D}\u{438}\u{435} \u{432} \(chatName)"
                     : "\(senderName) edited a message in \(chatName)"
             }
         }
